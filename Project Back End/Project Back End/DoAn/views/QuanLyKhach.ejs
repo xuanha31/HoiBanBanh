@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="/css/bootstrap.min.css" >
+	<link rel="stylesheet" href="/css/myweb.css" >
+	<script src="js/jquery-2.1.4.min.js"></script>
+	<script src="js/bootstrap.min.js" ></script>
+</head>
+<body>
+<div role="navigation" class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button data-target=".navbar-collapse" data-toggle="collapse" class="navbar-toggle" type="button">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+           <img src="images/logo.png" class="img-rounded" alt="logo" width="100" height="60">
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">Admin</a></li>
+            <li><a href="#">Đăng Xuất</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+    <div class="container"; style="margin-top: 62px">
+    <div class="row">
+    <div class="col-xs-2">
+
+      <div class="btn-group-vertical">
+        <button type="button" class="btn btn-default">Quản lý khách</button>
+        <button type="button" class="btn btn-default">Quản lý bánh</button>
+        <button type="button" class="btn btn-default">Quản lý blog</button>
+        <button type="button" class="btn btn-default">Đơn hàng</button>
+        <button type="button" class="btn btn-default">Thêm sự kiện</button>
+        <button type="button" class="btn btn-default">Thêm blog</button>
+        <button type="button" class="btn btn-default">Thêm mẫu bánh</button>
+        <button type="button" class="btn btn-default">Liên hệ</button>
+        <button type="button" class="btn btn-default">Doanh thu</button>
+
+         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Giới Thiệu
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li><a href="#">Giới thiệu chung</a></li>
+      <li><a href="#">Thư viện ảnh</a></li>
+    </ul>
+    </div>
+
+    </div>
+
+  <div class="col-xs-10" style="margin-top: 5%">
+		<form action="/PrintAccountSearch.js" method="GET">
+    <div class="input-group" style="width: 40%;">
+      <input type="text" class="form-control" name="user">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="submit" value="Search" style="margin-top: 0px;"><span class="glyphicon glyphicon-search"></span></button>
+      </span>
+    </div>
+		</form>
+		<form action="/UpdateHuman.js?" method="GET">
+    <table class="table table-bordered" style="margin-top: 5%">
+    <tr>
+    <th>Email</th>
+    <th>Tên Khách Hàng</th>
+    <th>Địa Chỉ</th>
+    <th>Điện Thoại</th>
+    <th>Ngày Tạo</th>
+		<th>Ngày Thay Đổi</th>
+    <th>Chú Thích</th>
+		<th>Vai trò</th>
+    <th>Chặn</th>
+  </tr>
+<%if (result.length > 0) {%>
+<% for(var i=0;i<result.length; i++){%>
+
+  <tr>
+
+    <td><%= result[i].email%></td>
+    <td><%= result[i].name%></td>
+    <td><%= result[i].address%></td>
+    <td><%= result[i].phone%></td>
+    <td><%= result[i].date_create%></td>
+		<td><%= result[i].date_update%></td>
+		<td>
+			  <input type="text" name="note" value="<%= result[i].note%>">
+		</td>
+
+		<% if(result[i].role == 1){ %>
+			<td>
+	     Khách Hàng
+	    </td>
+		<%}else{%>
+			<td>
+				Nhân Viên
+			</td>
+		<%} %>
+
+		<% if(result[i].black_list == false){ %>
+			<td>
+	      <input type="checkbox" value="false" name ="lock" >
+	    </td>
+		<% } else{%>
+			<td>
+				<input type="checkbox" value="true"  name ="lock" checked>
+			</td>
+		<%} %>
+
+
+  </tr>
+  <% }} %>
+    </table>
+      <button type="submit" class="btn btn-default">Hủy</button>
+      <button type="submit" class="btn btn-default" value="save">Lưu</button>
+	</form>
+  </div>
+
+</div>
+
+    </div>
+</body>
+</html>
