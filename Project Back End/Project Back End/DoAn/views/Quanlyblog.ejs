@@ -8,7 +8,7 @@
 	<script src="js/jquery-2.1.4.min.js"></script>
 	<script src="js/bootstrap.min.js" ></script>
 </head>
-<body>	
+<body>
 <div role="navigation" class="navbar navbar-default navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
@@ -18,7 +18,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-           <img src="images/logo.png" class="img-rounded" alt="logo" width="100" height="60"> 
+           <img src="images/logo.png" class="img-rounded" alt="logo" width="100" height="60" onclick="window.location.href='/Home';">
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
@@ -31,17 +31,17 @@
     <div class="container"; style="margin-top: 62px">
     <div class="row">
     <div class="col-xs-2">
-      
+
       <div class="btn-group-vertical">
-        <button type="button" class="btn btn-default">Quản lý khách</button>
-        <button type="button" class="btn btn-default">Quản lý bánh</button>
-        <button type="button" class="btn btn-default">Quản lý blog</button>
-        <button type="button" class="btn btn-default">Đơn hàng</button>
-        <button type="button" class="btn btn-default">Thêm sự kiện</button>
-        <button type="button" class="btn btn-default">Thêm blog</button>
-        <button type="button" class="btn btn-default">Thêm mẫu bánh</button>
-        <button type="button" class="btn btn-default">Liên hệ</button>
-        <button type="button" class="btn btn-default">Doanh thu</button>
+				<button type="button" class="btn btn-default" onclick="window.location.href='/HumanManage';">Quản lý khách</button>
+				<button type="button" class="btn btn-default" onclick="window.location.href='/CakeManage';">Quản lý bánh</button>
+				<button type="button" class="btn btn-default" onclick="window.location.href='/BlogManage';">Quản lý blog</button>
+				<button type="button" class="btn btn-default" onclick="window.location.href='/Staff';">Thêm nhân viên</button>
+				<button type="button" class="btn btn-default" onclick="window.location.href='/InsertEvent';">Thêm sự kiện</button>
+				<button type="button" class="btn btn-default"	onclick="window.location.href='/BlogManage';">Thêm blog</button>
+				<button type="button" class="btn btn-default"	onclick="window.location.href='/InsertCake';">Thêm mẫu bánh</button>
+				<button type="button" class="btn btn-default" onclick="window.location.href='/Category';">Thêm Danh Mục</button>
+				<button type="button" class="btn btn-default">Doanh thu</button>
 
          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Giới Thiệu
       <span class="caret"></span>
@@ -51,25 +51,35 @@
       <li><a href="#">Thư viện ảnh</a></li>
     </ul>
     </div>
-    
+
     </div>
   <div class="col-xs-10" style="margin-top: 5%">
+		<form action="/SearchBlog" method="get">
     <div class="input-group" style="width: 40%;">
-      <input type="text" class="form-control" placeholder="Search">
+      <input name="title" type="text" class="form-control" placeholder="Search">
       <span class="input-group-btn">
-        <button class="btn btn-default" type="button" style="margin-top: 0px;"><span class="glyphicon glyphicon-search">
+        <button class="btn btn-default" type="submit" style="margin-top: 0px;"><span class="glyphicon glyphicon-search">
         </span>
         </button>
       </span>
     </div>
+	</form>
     <!-- blog -->
     <div class="panel panel-default" style="margin-top: 3%;">
-  <div class="panel-heading">Panel heading without title</div>
-  <div class="panel-body">
-    Panel content
-  </div>
-</div>
 
+</div>
+<% if(result.length>0){
+	for(var i = 0 ; i < result.length ; i++){ %>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><%=result[i].title%>                  Thời gian viết : <%=result[i].date_create%></h3>
+			</div>
+			<div class="panel-body">
+				<%=result[i].content%>
+			</div>
+		</div>
+<%	}
+}%>
 <div class="panel panel-default">
   <div class="panel-heading">
     <h3 class="panel-title">Panel title</h3>
@@ -87,7 +97,7 @@
 
   </div>
 </div>
-    
+
     </div>
 </body>
 </html>

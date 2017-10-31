@@ -15,14 +15,14 @@ server.listen(3000);
 
 app.get('/PrintCake.js?', function (req, res){
     //get value from textbox search
-    var cake = req.param('cake');
+var cake = req.param('cake');
 
 var MongoClient = require('mongodb').MongoClient;
 MongoClient.connect(url, function(err, db) {
   if (err) throw err;
 
 	var query = { name : cake };
-  db.collection("Cake").find(query).toArray(function(err, result) {
+  db.collection("Cake").find().toArray(function(err, result) {
     res.render("QuanlyBanh", {result : result});
     db.close();
 });

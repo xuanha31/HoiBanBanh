@@ -33,6 +33,9 @@ let HumanSchema = new Schema({
   note : {
     type : String
   },
+  linkImage: {
+    type : String
+  },
   date_create :{
     type : Date,
     require: true

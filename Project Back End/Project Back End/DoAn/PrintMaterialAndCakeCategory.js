@@ -2,6 +2,8 @@
 const mongoose = require('mongoose')
 const CakeCategoryModel = require('./Schema/CakeCategorySchema');
 const cakeModel = require('./Schema/CakeSchema');
+const EventModel = require('./Schema/EventSchema');
+const BlogModel = require('./Schema/BlogSchema');
 //2.connect
 const config = require('./config.json')
 var url = config.connectionString;
@@ -23,7 +25,7 @@ mongoose.connect(config.connectionString,(err)=>{
     console.log('connect db success');;
   }
 })
-app.get('/Prepare', function(req,res){
+app.get('/InsertCake', function(req,res){
   var MongoClient = require('mongodb').MongoClient;
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
@@ -37,14 +39,14 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false })
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-// upload Image
+// upload Image c
 var storage = multer.diskStorage({
   destination : function(req,file,cb){cb(null,'./Upload')},
   filename : function(req,file,cb){cb(null,file.originalname)}
 })
 
 var upload = multer({storage : storage})
-app.post('/Upload',upload.single("file"),function(req,res){
+app.post('/UploadCake',upload.single("file"),function(req,res){
   var cake_name = req.body.cake.name;
   var cake_categogy = req.body.cake.categogy;
   var cake_material = req.body.cake.material;
@@ -74,6 +76,147 @@ app.post('/Upload',upload.single("file"),function(req,res){
         });
 
       })
-  res.render("Home",{})
+    db.collection("CakeCategory").find().toArray(function(err, resultCakeCategory) {
+      res.render("Themmaubanh", {resultCakeCategory : resultCakeCategory});
+      db.close();
+      })
 });
+  });
+  app.get('/InsertEvent', function(req,res){
+    res.render("Themsukien",{});
+  })
+app.post('/UploadEvent',upload.single("file"),function(req,res){
+    var event_title = req.body.event.title;
+    var event_content = req.body.event.content;
+    var event_link = req.file.path;
+
+    var MongoClient = require('mongodb').MongoClient;
+    MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+
+      EventModel.create({
+      title : event_title,
+      content : event_content,
+      link : event_link,
+      date_create: new Date()
+  })
+    res.render("Themsukien",{})
+  });
+    });
+
+    app.get('/InsertBlog', function(req,res){
+      res.render("Themblog",{});
+    })
+  app.post('/UploadBlog',upload.single("file"),function(req,res){
+      var blog_title = req.body.blog.title;
+      var blog_content = req.body.blog.content;
+      var blog_link = req.file.path;
+
+      var MongoClient = require('mongodb').MongoClient;
+      MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+
+        BlogModel.create({
+        title : blog_title,
+        content : blog_content,
+        link : blog_link,
+        date_create: new Date()
+    })
+      res.render("Themblog",{})
+    });
+      });
+
+  app.get('/BlogManage',function(req,res){
+      var MongoClient = require('mongodb').MongoClient;
+    MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+        db.collection("Blog").find().toArray(function(err, result) {
+            res.render("Quanlyblog",{result: result});
+        })
+    })
+  });
+
+  app.get('/SearchBlog', function (req, res){
+
+      var title = req.param('title');
+      var MongoClient = require('mongodb').MongoClient;
+      MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        db.collection("Blog").find({title:title}).toArray(function(err, result) {
+          res.render("Quanlyblog", {result : result});
+          db.close();
+
+      });
+        });
+
+  });
+
+  app.get("/Home",function(req,res){
+    res.render("Home",{})
+  });
+
+  app.get('/HumanManage',function(req,res){
+      var MongoClient = require('mongodb').MongoClient;
+    MongoClient.connect(url, function(err, db) {
+      if (err) throw err;
+        db.collection("Human").find().toArray(function(err, result) {
+            res.render("QuanLyKhach",{result: result});
+        })
+    })
+  });
+
+  app.get('/PrintAccountSearch.js?', function (req, res){
+
+      var user = req.param('user');
+      // res.sendfile('./views/QuanLyKhach.html');
+      // console.log(user);
+  console.log("Da Den Print 2");
+  var MongoClient = require('mongodb').MongoClient;
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+      //var search = req.params.username;
+  	// var query = { name :user };
+    //console.log(query);
+    db.collection("Human").find({name:user}).toArray(function(err, result) {
+      //console.log(result.length);
+
+    //  if(result.length>0){
+      // console.log(result[0]._id);
+      // console.log(result[0].name);
+      // console.log(result[0].email);
+      // console.log(result[0].phone);
+      // app.get("/PrintAccountSearch.js", function(req,res){
+      //res.sendFile(__dirname +"/QuanLyKhach.html");
+      //res.send("<p>"+result[0].email+"</p>");
+      res.render("QuanLyKhach", {result : result});
+      db.close();
+
+  });
+    });
+
+  });
+  app.get('/CakeManage', function (req, res){
+  var MongoClient = require('mongodb').MongoClient;
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    db.collection("Cake").find().toArray(function(err, result) {
+      res.render("QuanlyBanh", {result : result});
+      db.close();
+  });
+    });
+  });
+  app.get('/PrintCakeSearch?', function (req, res){
+      //get value from textbox search
+  var cake = req.param('cake');
+
+  var MongoClient = require('mongodb').MongoClient;
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+
+  	var query = { name : cake };
+    db.collection("Cake").find(query).toArray(function(err, result) {
+      res.render("QuanlyBanh", {result : result});
+      db.close();
+  });
+    });
   });
