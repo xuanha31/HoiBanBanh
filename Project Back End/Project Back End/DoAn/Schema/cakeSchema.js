@@ -6,36 +6,47 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 
 let CakeSchema = new Schema({
-  name :{
+  cake_type_ids:{
+    type: Schema.Types.ObjectId,
+    ref: 'CakeType'
+},
+  name_cake :{
     type : String,
     require:true
   },
-  cake_category :{
-    type: Schema.Types.ObjectId,
-    ref: 'CakeCategory'
-  },
-  price :{
-    type : Number,
-    require: true
-  },
-  material :{
-    type: String
-  },
-  size:{
-    type: String,
-    require: true
-  },
-  linkImage :{
-    type : String
-  },
-  quantum :{
-    type : Number ,
-    require :true
-  },
-  date_create :{
-    type : Date,
-    require: true
-  }
+  material :
+  [String],
+name_size : {
+  type: String ,
+  require : true
+},
+quantity :{
+  type : Number ,
+  require :true
+},
+price :{
+  type : Number,
+  require: true
+},
+
+
+description:{
+  type: String
+},
+linkImage :{
+  type : String
+},
+date_create :{
+  type : Date,
+  require: true
+},
+status:{
+  type : Boolean,
+  require : true
+}
+
+
+
 
 }, {collection :'Cake'});
 

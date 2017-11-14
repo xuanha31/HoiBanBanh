@@ -12,14 +12,21 @@ mongoose.connect(config.connectionString,(err)=>{
 
 
 BillModel.create({
-  name : "gau",
-  cake_category: "59d3ac817f6d88167032e6d4",
-  price : 1234,
-  material: "59d3ab74c2a3f724246bf1d8",
-  size : "50x50",
-  linkImage : "Upload\bannel1.png",
-  quantum : 100,
-  date_create: new Date()
+  name_id:"5a089cfa08986c4404799c81",
+  name: "Kien",
+  phone : "01234556781",
+  address : " Ha Noi",
+  email : "kiennt@gmail.com",
+  cake:[{
+  cake_name: "Bánh Nướng",
+  price : 180000,
+  quantity : 3},{
+  cake_name : "Bánh Dẻo Nhân Đậu Xanh",
+  price : 100000,
+  quantity : 2}
+  ],
+  confirm : false,
+  time : new Date ()
 
 });
 mongoose.connection.close();

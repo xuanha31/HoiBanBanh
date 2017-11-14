@@ -11,7 +11,7 @@ let HumanSchema = new Schema({
     require:true
   },
   phone :{
-    type : Number ,
+    type : String ,
     require: true
   },
   password :{

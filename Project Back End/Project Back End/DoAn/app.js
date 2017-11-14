@@ -1,10 +1,12 @@
 //1.require mongoose
 const mongoose = require('mongoose')
-const CakeCategoryModel = require('./Schema/CakeCategorySchema');
 const cakeModel = require('./Schema/CakeSchema');
 const EventModel = require('./Schema/EventSchema');
 const BlogModel = require('./Schema/BlogSchema');
 const humanModel = require('./Schema/HumanSchema');
+const cakeTypeModel = require('./Schema/CakeTypeSchema');
+const BillModel = require('./Schema/BillSchema');
+
 //2.connect
 const config = require('./config.json')
 var url = config.connectionString;
@@ -15,9 +17,9 @@ var multer = require('multer')
 var bodyParser = require('body-parser')
 //cau hinh ejs
 app.set("view engine","ejs");
-app.set("views","./views");
+app.set("views","./views/Admin");
 
-app.use(express.static(__dirname + '/views'));
+app.use(express.static(__dirname + '/views/Admin'));
 server.listen(3000);
 mongoose.connect(config.connectionString,(err)=>{
   if(err){
@@ -30,7 +32,7 @@ app.get('/InsertCake', function(req,res){
   var MongoClient = require('mongodb').MongoClient;
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
-  db.collection("CakeCategory").find().toArray(function(err, resultCakeCategory) {
+  db.collection("CakeType").find().toArray(function(err, resultCakeCategory) {
     res.render("Themmaubanh", {resultCakeCategory : resultCakeCategory});
     db.close();
     })
@@ -53,31 +55,31 @@ app.post('/UploadCake',upload.single("file"),function(req,res){
   var cake_material = req.body.cake.material;
   var cake_size = req.body.cake.size;
   var cake_price = req.body.cake.price;
-  var cake_quantum  = req.body.cake.quantum;
+  var cake_quantity = req.body.cake.quantity;
+  var cake_description = req.body.cake.description;
   var cake_link = req.file.path;
   var cake_idcategory;
   var MongoClient = require('mongodb').MongoClient;
+
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
+    var id = require('mongodb').ObjectID(cake_categogy);
 
-    db.collection("CakeCategory").find({name:cake_categogy}, {"_id": 1}).toArray(function(err, result) {
-        cake_idcategory=result[0]._id;
-        console.log(cake_idcategory);
-        console.log(cake_link);
         cakeModel.create({
-          name : cake_name ,
-          cake_category: cake_idcategory,
+          cake_type_ids : id,
+          name_cake : cake_name ,
           price : cake_price,
-          material: cake_material,
-          size : cake_size ,
+          material : cake_material,
+          name_size : cake_size ,
           linkImage : cake_link,
-          quantum : cake_quantum,
+          quantity : cake_quantity,
+          description : cake_description,
+          status: false,
           date_create: new Date()
 
-        });
+      });
 
-      })
-    db.collection("CakeCategory").find().toArray(function(err, resultCakeCategory) {
+    db.collection("CakeType").find().toArray(function(err, resultCakeCategory) {
       res.render("Themmaubanh", {resultCakeCategory : resultCakeCategory});
       db.close();
       })
@@ -169,11 +171,11 @@ app.post('/UploadEvent',upload.single("file"),function(req,res){
   app.get('/PrintAccountSearch.js?', function (req, res){
 //get value from textbox
     var user = req.param('user');
-  console.log("Da Den Print 2");
+    console.log(users);
   var MongoClient = require('mongodb').MongoClient;
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
-    db.collection("Human").find({name:user}).toArray(function(err, result) {
+    db.collection("Human").find({name:{users}}).toArray(function(err, result) {
       res.render("QuanLyKhach", {result : result});
       db.close();
 
@@ -199,7 +201,7 @@ app.post('/UploadEvent',upload.single("file"),function(req,res){
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
 
-  	var query = { name : cake };
+  	var query = { name_cake : cake };
     db.collection("Cake").find(query).toArray(function(err, result) {
       res.render("QuanlyBanh", {result : result});
       db.close();
@@ -221,20 +223,26 @@ app.post('/UploadEvent',upload.single("file"),function(req,res){
     var MongoClient = require('mongodb').MongoClient;
     MongoClient.connect(url, function(err, db) {
       if (err) throw err;
+      db.collection('Human').find({$or: [ {email: email }, { phone: phone} ] }).toArray(function(err,result){
+        if(result.length > 0 ){
+          humanModel.create({
+            name : name,
+            phone : phone,
+            password: password,
+            email : email,
+            address : address,
+            role :2,
+            note : note,
+            linkImage: link,
+            date_create: new Date(),
+            date_update: new Date(),
+            black_list : false
+          });
+        }
 
-      humanModel.create({
-        name : name,
-        phone : phone,
-        password: password,
-        email : email,
-        address : address,
-        role :2,
-        note : note,
-        linkImage: link,
-        date_create: new Date(),
-        date_update: new Date(),
-        black_list : false
-      });
+    db.close
+    })
+
 
   });
   res.render("Themnhanvien",{});
@@ -245,8 +253,240 @@ app.get('/Category',function(req,res){
 });
 app.get('/InsertCategory',function(req,res){
   var name_category = req.param('category');
-  CakeCategoryModel.create({
-    name : name_category
+  cakeTypeModel.create({
+    cake_type : name_category
   });
     res.render("ThemDanhMuc",{});
 });
+//UpdateHuman
+app.get('/InfoUpdateStaff',function(req,res){
+  var o_id = req.param('id');
+  var id = require('mongodb').ObjectID(o_id);
+  var MongoClient = require('mongodb').MongoClient;
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    db.collection("Human").find({ _id: id , role : 2}).toArray(function(err, result) {
+      if(result.length > 0 ){
+        res.render("CapNhatKhach", {result: result});
+        db.close();
+      }else{
+          db.collection("Human").find().toArray(function(err, result) {
+          res.render("QuanLyKhach", {result : result});
+          db.close();
+      })
+    }
+
+  });
+    });
+})
+app.post('/UpdateStaff',function(req,res){
+  var o_id = req.body.staff.id;
+  var id = require('mongodb').ObjectID(o_id);
+  var MongoClient = require('mongodb').MongoClient
+  MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var myquery = { _id : id };
+  var newvalues = {
+    name: req.body.staff.name,
+    address: req.body.staff.address ,
+    password : req.body.staff.password ,
+    phone : req.body.staff.phone ,
+    email : req.body.staff.email ,
+    note :  req.body.staff.note,
+    date_update : new Date()  };
+  var newvalue = {email : req.body.staff.email};
+  db.collection("Human").updateOne(myquery, {$set :newvalues}, function(err, result) {
+    db.close();
+  });
+  db.collection("Human").find().toArray(function(err, result) {
+  res.render("QuanLyKhach", {result : result});
+  db.close();
+})
+});
+})
+//Update cake
+app.get('/InfoUpdateCake',function(req,res){
+  var o_id = req.param('id');
+  var id = require('mongodb').ObjectID(o_id);
+  var MongoClient = require('mongodb').MongoClient;
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+
+    db.collection("Cake").find({ _id: id}).toArray(function(err, result) {
+      if(result.length > 0 ){
+        res.render("CapNhatbanh", {result: result});
+        db.close();
+      }else{
+          db.collection("Cake").find().toArray(function(err, result) {
+          res.render("QuanLybanh", {result : result});
+          db.close();
+      })
+    }
+
+  });
+    });
+})
+
+
+app.post('/UpdateCake',upload.single("file"),function(req,res){
+  var o_id = req.body.cake.id;
+  var id = require('mongodb').ObjectID(o_id);
+  var MongoClient = require('mongodb').MongoClient
+  MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var myquery = { _id : id };
+  console.log(req.body.cake.quantity);
+  var newvalues = {
+    name_cake: req.body.cake.name,
+    description: req.body.cake.description ,
+    name_size : req.body.cake.size ,
+    price : req.body.cake.price ,
+    quantity : req.body.cake.quantity ,
+    linkImage :  req.file.path,
+    };
+
+  db.collection("Cake").updateOne(myquery, {$set :newvalues}, function(err, result) {
+    db.close();
+  });
+  db.collection("Cake").find().toArray(function(err, result) {
+  res.render("QuanLybanh", {result : result});
+  db.close();
+})
+});
+})
+//Category Manager
+
+app.get('/CakeCategoryManage', function (req, res){
+var MongoClient = require('mongodb').MongoClient;
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  db.collection("CakeType").find().toArray(function(err, result) {
+    res.render("QuanlyDanhMuc", {result : result});
+    db.close();
+});
+  });
+});
+
+//Login
+app.get('/DangNhap',function(req,res){
+  res.render("login",{});
+});
+app.post('/Login',function(req,res){
+  var email = req.body.human.email;
+  var password= req.body.human.password;
+  var MongoClient = require('mongodb').MongoClient;
+  MongoClient.connect(url, function(err, db) {
+    if (err) throw err;
+    db.collection("Human").find({email:email,password:password}).toArray(function(err, result) {
+      if(result.length > 0){
+        if(result[0].role == 2){
+            res.render("QuanlyBanh",{});
+        }else if(result[0].role == 3){
+          res.render("Home",{});
+        }else{
+          res.render("Themsukien",{})
+        }
+      }else{
+        console.log("user or pass wrong");
+        res.render("login",{});
+      }
+
+
+      db.close();
+  });
+    });
+})
+
+//bill
+app.get('/Bill',function(req,res){
+  var date= new Date();
+  console.log(date);
+
+var MongoClient = require('mongodb').MongoClient;
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  db.collection('Bill').find({
+    time : {"$lt": date}
+    }).toArray(function(err, result) {
+    res.render("Donhang",{result:result});
+    })
+
+
+    db.close();
+});
+})
+
+app.get('/ConfirmBill',function(req,res){
+  var o_id = req.param('id');
+  var id = require('mongodb').ObjectID(o_id);
+  var date= new Date();
+  console.log(id);
+BillModel.update({_id : id},{confirm : true}).exec((err,result)=>{console.log(result)});
+var MongoClient = require('mongodb').MongoClient;
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  db.collection('Bill').find({
+    time : {"$lt": date}
+    }).toArray(function(err, result) {
+    res.render("Donhang",{result:result});
+    })
+
+
+    db.close();
+});
+})
+
+
+app.get('/UnConfirmBill',function(req,res){
+  var o_id = req.param('id');
+  var id = require('mongodb').ObjectID(o_id);
+  var date= new Date();
+  console.log(id);
+BillModel.update({_id : id},{confirm : false}).exec((err,result)=>{console.log(result)});
+var MongoClient = require('mongodb').MongoClient;
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  db.collection('Bill').find({
+    time : {"$lt": date}
+    }).toArray(function(err, result) {
+    res.render("Donhang",{result:result});
+    })
+
+
+    db.close();
+});
+})
+
+app.get('/BlockUser',function(req,res){
+  var nameuser_o_id = req.param('id');
+  var id = require('mongodb').ObjectID(nameuser_o_id);
+  var date= new Date();
+
+humanModel.update({_id : id},{black_list : true}).exec((err,result)=>{console.log(result)});
+var MongoClient = require('mongodb').MongoClient;
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  db.collection("Human").find().toArray(function(err, result) {
+    res.render("QuanLyKhach", {result : result});
+    db.close();
+});
+
+});
+})
+
+app.get('/UnBlockUser',function(req,res){
+  var nameuser_o_id = req.param('id');
+  var id = require('mongodb').ObjectID(nameuser_o_id);
+  var date= new Date();
+
+humanModel.update({_id : id},{black_list : false}).exec((err,result)=>{console.log(result)});
+var MongoClient = require('mongodb').MongoClient;
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  db.collection("Human").find().toArray(function(err, result) {
+    res.render("QuanLyKhach", {result : result});
+    db.close();
+});
+
+});
+})

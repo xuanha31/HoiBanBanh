@@ -12,8 +12,8 @@ mongoose.connect(config.connectionString,(err)=>{
 
 humanModel.create({
   name : "Kien",
-  phone : 01234556781,
-  password: "admin",
+  phone : "01234556781",
+  password: "customer",
   email : "xuanha31@gmail.com",
   address : " Ha Noi",
   role : 1,
@@ -24,11 +24,22 @@ humanModel.create({
 });
 humanModel.create({
   name : "Tuan",
-  phone : 01234556781,
-  password: "admin",
+  phone : "01234556781",
+  password: "staff",
   email : "xuanha31@gmail.com",
   address : " Ha Noi",
   role :2,
+  date_create: new Date(),
+  date_update: new Date(),
+  black_list : true
+});
+humanModel.create({
+  name : "Admin",
+  phone : "0985222215",
+  password: "admin",
+  email : "xuanha31@gmail.com",
+  address : " Ha Noi",
+  role :3,
   date_create: new Date(),
   date_update: new Date(),
   black_list : true
